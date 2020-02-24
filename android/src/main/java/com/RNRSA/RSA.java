@@ -32,6 +32,8 @@ import java.security.cert.CertificateException;
 import java.security.spec.X509EncodedKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PSSParameterSpec;
+import java.security.spec.MGF1ParameterSpec;
 
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -162,6 +164,10 @@ public class RSA {
 
     private String sign(byte[] messageBytes, String algorithm) throws NoSuchAlgorithmException, InvalidKeySpecException, IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException, InvalidKeyException, SignatureException {
         Signature privateSignature = Signature.getInstance(algorithm);
+        
+        privateSignature .setParameter(new PSSParameterSpec(MGF1ParameterSpec.SHA512.getDigestAlgorithm(), "MGF1",
+                    MGF1ParameterSpec.SHA512, 446, 1));
+
         privateSignature.initSign(this.privateKey);
         privateSignature.update(messageBytes);
         byte[] signature = privateSignature.sign();
